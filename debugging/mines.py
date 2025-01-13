@@ -9,7 +9,13 @@ class Minesweeper:
     def __init__(self, width=10, height=10, mines=10):
         self.width = width
         self.height = height
-        self.mines = set(random.sample(range(width * height), mines))
+        self.mines = set()
+        # Placer les mines de manière correcte en utilisant des coordonnées (x, y)
+        while len(self.mines) < mines:
+            x = random.randint(0, width - 1)
+            y = random.randint(0, height - 1)
+            self.mines.add((x, y))  # Ajouter les mines en utilisant des coordonnées (x, y)
+        
         self.field = [[' ' for _ in range(width)] for _ in range(height)]
         self.revealed = [[False for _ in range(width)] for _ in range(height)]
 
@@ -20,7 +26,7 @@ class Minesweeper:
             print(y, end=' ')
             for x in range(self.width):
                 if reveal or self.revealed[y][x]:
-                    if (y * self.width + x) in self.mines:
+                    if (x, y) in self.mines:
                         print('*', end=' ')
                     else:
                         count = self.count_mines_nearby(x, y)
@@ -35,12 +41,12 @@ class Minesweeper:
             for dy in [-1, 0, 1]:
                 nx, ny = x + dx, y + dy
                 if 0 <= nx < self.width and 0 <= ny < self.height:
-                    if (ny * self.width + nx) in self.mines:
+                    if (nx, ny) in self.mines:
                         count += 1
         return count
 
     def reveal(self, x, y):
-        if (y * self.width + x) in self.mines:
+        if (x, y) in self.mines:
             return False
         self.revealed[y][x] = True
         if self.count_mines_nearby(x, y) == 0:
@@ -64,9 +70,15 @@ class Minesweeper:
         while True:
             self.print_board()  # Affiche la grille à chaque tour
             try:
-                x = int(input("Enter x coordinate: "))
-                y = int(input("Enter y coordinate: "))
+                # Demande les coordonnées x et y avec une validation des entrées
+                x = int(input(f"Enter x coordinate (0 to {self.width - 1}): "))
+                y = int(input(f"Enter y coordinate (0 to {self.height - 1}): "))
                 
+                # Vérification que les coordonnées sont dans les limites du plateau
+                if not (0 <= x < self.width and 0 <= y < self.height):
+                    print(f"Coordinates out of bounds. Please enter values between 0 and {self.width - 1} for x, and between 0 and {self.height - 1} for y.")
+                    continue
+
                 if not self.reveal(x, y):
                     self.print_board(reveal=True)
                     print("Game Over! You hit a mine.")
@@ -77,6 +89,7 @@ class Minesweeper:
                     self.print_board(reveal=True)
                     print("Congratulations! You've won the game.")
                     break
+
             except ValueError:
                 print("Invalid input. Please enter numbers only.")
 
