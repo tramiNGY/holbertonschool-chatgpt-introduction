@@ -9,7 +9,6 @@ class Minesweeper:
     def __init__(self, width=10, height=10, mines=10):
         self.width = width
         self.height = height
-        # Create a set of (x, y) coordinates for mines
         self.mines = set()
         while len(self.mines) < mines:
             x = random.randint(0, width - 1)
@@ -46,9 +45,12 @@ class Minesweeper:
         return count
 
     def reveal(self, x, y):
+        # Si une mine est trouvée, retourne False (game over)
         if (x, y) in self.mines:
             return False
         self.revealed[y][x] = True
+        
+        # Si aucune mine autour, révèle les cases adjacentes
         if self.count_mines_nearby(x, y) == 0:
             for dx in [-1, 0, 1]:
                 for dy in [-1, 0, 1]:
@@ -60,6 +62,14 @@ class Minesweeper:
     def valid_coordinates(self, x, y):
         """Check if the coordinates are within the game board bounds."""
         return 0 <= x < self.width and 0 <= y < self.height
+
+    def check_win(self):
+        """Check if the player has revealed all non-mine cells."""
+        for y in range(self.height):
+            for x in range(self.width):
+                if (x, y) not in self.mines and not self.revealed[y][x]:
+                    return False  # If there's any non-mine cell that's not revealed
+        return True  # All non-mine cells have been revealed
 
     def play(self):
         while True:
@@ -76,10 +86,16 @@ class Minesweeper:
                     self.print_board(reveal=True)
                     print("Game Over! You hit a mine.")
                     break
+                
+                # Check if the player has won
+                if self.check_win():
+                    self.print_board(reveal=True)
+                    print("Congratulations! You've won the game.")
+                    break
+
             except ValueError:
                 print("Invalid input. Please enter numbers only.")
 
 if __name__ == "__main__":
     game = Minesweeper()
     game.play()
-
