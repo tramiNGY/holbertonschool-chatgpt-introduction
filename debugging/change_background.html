@@ -24,17 +24,19 @@
 <button id="colorButton">Change Color</button>
 
 <script>
+    // Adding event listener directly on the button click
     document.getElementById("colorButton").addEventListener("click", function() {
         changeBackgroundColor();
     });
 
     function changeBackgroundColor() {
         // Generate a random color
-        var randomColor = "#" + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
-        // Change the background color of the body
+        var randomColor = "#" + Math.floor(Math.random() * 16777215).toString(16);
+        // Set the background color of the body to the random color
         document.body.style.backgroundColor = randomColor;
     }
 </script>
 
 </body>
 </html>
+
